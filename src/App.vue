@@ -104,8 +104,9 @@ export default {
     },
 
     getCurrentTemp: function () {
-      let hour = this.date.getHours();
-      let minute = this.date.getMinutes();
+      const dateNow = new Date();
+      const hour = dateNow.getHours();
+      const minute = dateNow.getMinutes();
       console.log(hour, minute);
       let index = 0;
       if (hour > 12) {
