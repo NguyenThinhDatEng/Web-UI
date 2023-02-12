@@ -11,7 +11,7 @@
       </div>
       <div class="weather_body">
         <div class="body_left">
-          <h1>{{ getCurrentTemp() }} ℃</h1>
+          <h1>{{ temperature }} ℃</h1>
           <div class="location">
             <h3>Hà Nội</h3>
             <h5>Việt Nam</h5>
@@ -71,6 +71,8 @@ export default {
   created() {
     // get current time
     this.time = moment().format("LT");
+    // get current temperature
+    this.temperature = this.getCurrentTemp();
     // get time milestones to show temp in table
     let pmTimes = this.timeDefault.slice(2, -2);
     this.timeShow = [...this.timeDefault, ...pmTimes];
@@ -79,6 +81,7 @@ export default {
   mounted() {
     setInterval(() => {
       this.time = moment().format("LT");
+      this.temperature = this.getCurrentTemp();
     }, 10000);
   },
   // Methods
@@ -101,6 +104,7 @@ export default {
     getCurrentTemp: function () {
       let hour = this.date.getHours();
       let minute = this.date.getMinutes();
+      console.log(this.temperature);
       if (hour > 12) {
         if (minute > 30) {
           return this.convertToC(this.data[26 + hour - 12 + 1]).replace(
@@ -119,6 +123,7 @@ export default {
   data() {
     return {
       moment: moment,
+      temperature: "",
       time: "",
       date: new Date(),
       data: [
