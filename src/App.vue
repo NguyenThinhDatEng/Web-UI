@@ -76,6 +76,8 @@ export default {
     // get time milestones to show temp in table
     let pmTimes = this.timeDefault.slice(2, -2);
     this.timeShow = [...this.timeDefault, ...pmTimes];
+    // get Data
+    this.getData();
   },
   // Update Dom
   mounted() {
@@ -104,20 +106,36 @@ export default {
     getCurrentTemp: function () {
       let hour = this.date.getHours();
       let minute = this.date.getMinutes();
-      console.log(this.temperature);
+      console.log(hour, minute);
+      let index = 0;
       if (hour > 12) {
         if (minute > 30) {
-          return this.convertToC(this.data[26 + hour - 12 + 1]).replace(
-            ".",
-            ","
-          );
+          index = 26 + hour - 12 + 1;
+          return this.convertToC(this.data[index]).replace(".", ",");
         }
-        return this.convertToC(this.data[26 + hour - 12]).replace(".", ",");
+        index = 26 + hour - 12;
+        return this.convertToC(this.data[index]).replace(".", ",");
       }
       if (minute > 30) {
-        return this.convertToC(this.data[0 + hour - 12 + 1]).replace(".", ",");
+        index = hour + 1;
+        return this.convertToC(this.data[index]).replace(".", ",");
       }
-      return this.convertToC(this.data[0 + hour - 12]).replace(".", ",");
+      return this.convertToC(this.data[hour]).replace(".", ",");
+    },
+
+    // CALL API
+    async getData() {
+      const url = "http:localhost/predict_results";
+      const options = {
+        method: "GET",
+      };
+      fetch(url, options)
+        .then((res) => res.json())
+        .then((json) => {
+          console.log(json);
+          // Gán data ở đây
+        })
+        .catch((err) => console.error("error:" + err));
     },
   },
   data() {
