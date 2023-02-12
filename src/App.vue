@@ -65,6 +65,8 @@
 
 <script>
 import moment from "moment";
+import axios from "axios";
+
 export default {
   name: "MyApp",
   // Before render Dom
@@ -122,19 +124,17 @@ export default {
     },
 
     // CALL API
-    async getData() {
+    getData: async function () {
       const url = "http:localhost/predict_results";
-      const options = {
-        method: "GET",
-      };
-      fetch(url, options)
-        .then((res) => res.json())
-        .then((json) => {
-          console.log(json);
-          // Gán data ở đây
-          this.data = json.response.data;
-        })
-        .catch((err) => console.error("error:" + err));
+      // POST request using axios with error handling
+      const article = { title: "Vue POST Request Example" };
+      axios
+        .post(url, article)
+        .then((response) => (this.articleId = response.data.id))
+        .catch((error) => {
+          this.errorMessage = error.message;
+          console.error("There was an error!", error);
+        });
     },
   },
   data() {
