@@ -107,21 +107,18 @@ export default {
       const dateNow = new Date();
       const hour = dateNow.getHours();
       const minute = dateNow.getMinutes();
-      console.log(hour, minute);
-      let index = 0;
+      let index = hour * 2;
       if (hour > 12) {
-        if (minute > 30) {
-          index = 26 + hour - 12 + 1;
-          return this.convertToC(this.data[index]).replace(".", ",");
+        if (minute >= 30) {
+          return this.convertToC(this.data[index + 1]).replace(".", ",");
         }
-        index = 26 + hour - 12;
         return this.convertToC(this.data[index]).replace(".", ",");
       }
-      if (minute > 30) {
-        index = hour + 1;
-        return this.convertToC(this.data[index]).replace(".", ",");
+      // hour <= 12
+      if (minute >= 30) {
+        return this.convertToC(this.data[index + 1]).replace(".", ",");
       }
-      return this.convertToC(this.data[hour]).replace(".", ",");
+      return this.convertToC(this.data[index]).replace(".", ",");
     },
 
     // CALL API
@@ -135,6 +132,7 @@ export default {
         .then((json) => {
           console.log(json);
           // Gán data ở đây
+          this.data = json.response.data;
         })
         .catch((err) => console.error("error:" + err));
     },
