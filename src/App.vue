@@ -11,7 +11,7 @@
       </div>
       <div class="weather_body">
         <div class="body_left">
-          <h1>{{ temperature }} ℃</h1>
+          <h1>{{ getCurrentTemp() }} ℃</h1>
           <div class="location">
             <h3>Hà Nội</h3>
             <h5>Việt Nam</h5>
@@ -19,7 +19,7 @@
         </div>
         <div class="body_right">
           <h1>{{ moment(date).format("DD/MM/YYYY") }}</h1>
-          <h1>{{ moment().format("LT") }}</h1>
+          <h1>{{ time }}</h1>
         </div>
       </div>
     </div>
@@ -27,24 +27,24 @@
       <div class="table__title">Daily Observations</div>
       <table>
         <thead>
-          <th>Time</th>
+          <th style="width: 50%">Time</th>
           <th>Temperature</th>
-          <th>Dew Point</th>
+          <!-- <th>Dew Point</th>
           <th>Humidity</th>
           <th>Wind</th>
           <th>Wind Speed</th>
           <th>Wind Gust</th>
           <th>Pressure</th>
           <th>Precip.</th>
-          <th>Condition</th>
+          <th>Condition</th> -->
         </thead>
         <tbody>
-          <tr v-for="(item, index) in data" :key="index">
-            <td>
-              {{ item["time"] }}
+          <tr v-for="(time, index) in timeShow" :key="index">
+            <td style="width: 50%">
+              {{ getTime(time, index) }}
             </td>
-            <td>{{ item["temperature"] }} ℃</td>
-            <td>{{ item["dew_point"] }} ℃</td>
+            <td>{{ convertToC(data[index]) }} ℃</td>
+            <!-- <td>{{ item["dew_point"] }} ℃</td>
             <td>{{ item["humidity"] }} %</td>
             <td>
               {{ item["wind"] }}
@@ -55,7 +55,7 @@
             <td>{{ item["precip"] }} in</td>
             <td>
               {{ item["condition"] }}
-            </td>
+            </td> -->
           </tr>
         </tbody>
       </table>
@@ -67,50 +67,94 @@
 import moment from "moment";
 export default {
   name: "MyApp",
+  // Before render Dom
+  created() {
+    // get current time
+    this.time = moment().format("LT");
+    // get time milestones to show temp in table
+    let pmTimes = this.timeDefault.slice(2, -2);
+    this.timeShow = [...this.timeDefault, ...pmTimes];
+  },
+  // Update Dom
+  mounted() {
+    setInterval(() => {
+      this.time = moment().format("LT");
+    }, 10000);
+  },
+  // Methods
+  methods: {
+    /**
+     * Chuyen doi do F sang do C
+     * @param {Number} F nhiet do tinh theo do F
+     */
+    convertToC: function (F) {
+      return (((F - 32) * 5) / 9).toFixed(2);
+    },
+
+    getTime: function (time, index) {
+      if (index < 26) {
+        return time + " " + "AM";
+      }
+      return time + " " + "PM";
+    },
+
+    getCurrentTemp: function () {
+      let hour = this.date.getHours();
+      let minute = this.date.getMinutes();
+      if (hour > 12) {
+        if (minute > 30) {
+          return this.convertToC(this.data[26 + hour - 12 + 1]).replace(
+            ".",
+            ","
+          );
+        }
+        return this.convertToC(this.data[26 + hour - 12]).replace(".", ",");
+      }
+      if (minute > 30) {
+        return this.convertToC(this.data[0 + hour - 12 + 1]).replace(".", ",");
+      }
+      return this.convertToC(this.data[0 + hour - 12]).replace(".", ",");
+    },
+  },
   data() {
     return {
-      temperature: "27,7",
       moment: moment,
+      time: "",
       date: new Date(),
-      time: new Date().getHours(),
       data: [
-        {
-          time: "12:00 AM",
-          temperature: 68,
-          dew_point: 66,
-          humidity: 94,
-          wind: "ESE",
-          wind_speed: 8,
-          wind_gust: 0,
-          pressure: 29.84,
-          precip: 0.0,
-          condition: "Cloudy",
-        },
-        {
-          time: "12:00 AM",
-          temperature: 68,
-          dew_point: 66,
-          humidity: 94,
-          wind: "ESE",
-          wind_speed: 8,
-          wind_gust: 0,
-          pressure: 29.84,
-          precip: 0.0,
-          condition: "Cloudy",
-        },
-        {
-          time: "12:00 AM",
-          temperature: 68,
-          dew_point: 66,
-          humidity: 94,
-          wind: "ESE",
-          wind_speed: 8,
-          wind_gust: 0,
-          pressure: 29.84,
-          precip: 0.0,
-          condition: "Cloudy",
-        },
+        56, 58, 60, 56, 58, 60, 56, 58, 60, 56, 58, 60, 56, 58, 60, 56, 58, 60,
+        56, 58, 60, 56, 58, 60, 56, 58, 60, 56, 58, 60, 56, 58, 60, 56, 58, 60,
+        56, 58, 60, 56, 58, 60, 56, 58, 60, 56, 58, 60, 56, 58, 60, 56, 58, 60,
       ],
+      timeDefault: [
+        "00:00",
+        "00:30",
+        "01:00",
+        "01:30",
+        "02:00",
+        "02:30",
+        "03:00",
+        "03:30",
+        "04:00",
+        "04:30",
+        "05:00",
+        "05:30",
+        "06:00",
+        "06:30",
+        "07:00",
+        "07:30",
+        "08:00",
+        "08:30",
+        "09:00",
+        "09:30",
+        "10:00",
+        "10:30",
+        "11:00",
+        "11:30",
+        "12:00",
+        "12:30",
+      ],
+      timeShow: [],
     };
   },
 };
@@ -134,6 +178,7 @@ export default {
   width: 500px;
   border-radius: 15px;
   margin-bottom: 24px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .weather_top {
@@ -179,8 +224,7 @@ svg {
 
 /* -------- Table ------------ */
 .table {
-  width: 100%;
-  color: #fff;
+  width: 50%;
 }
 
 .table__title {
@@ -192,6 +236,10 @@ table {
   font-family: arial, sans-serif;
   border-collapse: collapse;
   width: 100%;
+}
+
+th {
+  background-color: #f7f7f7;
 }
 
 td,
